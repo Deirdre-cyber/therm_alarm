@@ -1,5 +1,13 @@
 # ThermAlarm
 
+## Research Topic
+
+* "Enhancing Room Temperature Monitoring and Alarm Systems using Micro:bit Integration with AWS Services"
+
+## Title
+
+* "Microbit-Driven Room Temperature Monitoring and Alarm System with AWS Integration”
+
 ## 1. Academic Research
 * Word Document report 8 pages minimum 10 pages max:
 * Content describing the background, results of your research and the potential for the system you have developed.

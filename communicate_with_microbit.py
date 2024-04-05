@@ -15,7 +15,7 @@ try:
         sys.exit()
 
     # log file is also for debugging
-    with open('temperature_data.txt', 'w') as log_file:
+    with open('temperature_data.txt', 'w', encoding='utf-8') as log_file:
         while True:
             try:
                 temperature_data = ser.readline().decode('utf-8').rstrip()

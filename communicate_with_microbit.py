@@ -19,16 +19,13 @@ try:
         while True:
             try:
                 temperature_data = ser.readline().decode('utf-8').rstrip()
-                print("Data received:", temperature_data)
-
+            
                 variables = temperature_data.split(',')
-
-                current_time = datetime.now()
 
                 # dictionary for the date for ease in uploading to the database
                 data = {
                     'sensor_id' : variables[0],
-                    'date_time' : current_time,
+                    'date_time' : datetime.now(),
                     'max_threshold' : variables[1],
                     'min_threshold' : variables[2],
                     'location_id' : variables[3],
@@ -40,7 +37,7 @@ try:
 
                 # following print statements all for debugging purposes
                 print("sensor_id:", data['sensor_id'])
-                print("date_time:", data['date'])
+                print("date_time:", data['date_time'])
                 print("max_threshold:", data['max_threshold'])
                 print("min_threshold:", data['min_threshold'])
                 print("location_id:", data['location_id'])

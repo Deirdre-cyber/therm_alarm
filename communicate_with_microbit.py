@@ -3,10 +3,14 @@ import sys
 from datetime import datetime
 import requests
 import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 COM_PORT = 'COM3'
 BAUD_RATE = 115200
-LAMBDA_ENDPOINT = 'https://woqi43dh1h.execute-api.eu-north-1.amazonaws.com/test'
+LAMBDA_ENDPOINT = os.getenv('LAMBDA_ENDPOINT')
 
 try:
     ser = serial.Serial(COM_PORT, BAUD_RATE)

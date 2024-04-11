@@ -12,37 +12,30 @@
     <div class="table-container">
       <table>
         <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>City</th>
-          <th>State</th>
-          <th>Shape</th>
-          <th>Duration</th>
-          <th>Summary</th>
-          <th>Image Included?</th>
-          <th>Image </th>
-          <th>Actions</th>
+          <th>Sensor ID</th>
+          <th>Time and Date</th>
+          <th>Current Temperature</th>
+          <th>Is Temperature Exceeded?</th>
+          <th>Location</th>
+          <th>Max Threshold</th>
+          <th>Min Threshold</th>
         </tr>
-        <tr>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-            <td>""</td>
-
+        <tr v-for="(item, index) in allTempData" :key="index">
+          <td>{{ item.SensorID }}</td>
+          <td>{{ item.TimeDate }}</td>
+          <td>{{ item.CurrTemp }}</td>
+          <td>{{ item.IsExceeded }}</td>
+          <td>{{ item.LocationID }}</td>
+          <td>{{ item.MaxThreshold }}</td>
+          <td>{{ item.MinThreshold }}</td>
         </tr>
       </table>
   
-      <!-- <div class="pagination">
+      <div class="pagination">
         <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
         <span>Page {{ currentPage }}</span>
-        <button @click="nextPage" :disabled="currentPage * 10 >= sightings.length">Next</button>
-      </div> -->
+        <button @click="nextPage" :disabled="currentPage * 10 >= allTempData.length">Next</button>
+      </div>
     </div>
   </template>
   
@@ -59,28 +52,50 @@
         type: String,
         default: "Here, you'll find all the data from the sensors.",
       },
+    },
+    data() {
+    return {
+      allTempData: []
+    };
+  },
+  async created() {
+    try {
+
+      const response = await fetch(process.env.VUE_APP_API_ENDPOINT, {
+      method: 'GET',
+      mode: 'cors'
+    });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const responsebody = await response.json();
+      this.allTempData = JSON.parse(responsebody.body)
+      
+    } catch (error) {
+      console.error('Error fetching data from API Gateway:', error);
     }
-    
-    
-    // computed: {
-    //   displayedSightings() {
-    //     const startIndex = (this.currentPage - 1) * 10;
-    //     const endIndex = startIndex + 10;
-    //     return this.sightings.slice(startIndex, endIndex);
-    //   },
-    // },
-    // methods: {
-    //   prevPage() {
-    //     if (this.currentPage > 1) {
-    //       this.currentPage--;
-    //     }
-    //   },
-    //   nextPage() {
-    //     if (this.currentPage) {
-    //       this.currentPage++;
-    //     }
-    //   },
-    // }
+  },
+    computed: {
+      displayedTempData() {
+        const startIndex = (this.currentPage - 1) * 10;
+        const endIndex = startIndex + 10;
+        return this.allTempData.slice(startIndex, endIndex);
+      },
+    },
+    methods: {
+      prevPage() {
+        if (this.currentPage > 1) {
+          this.currentPage--;
+        }
+      },
+      nextPage() {
+        if (this.currentPage) {
+          this.currentPage++;
+        }
+      },
+    }
   };
   </script>
   

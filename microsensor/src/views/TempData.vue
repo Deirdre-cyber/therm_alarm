@@ -55,7 +55,8 @@
     },
     data() {
     return {
-      allTempData: []
+      allTempData: [],
+      currentPage: 1
     };
   },
   async created() {
@@ -100,12 +101,6 @@
   </script>
   
   <style scoped>
-  #url_link {
-    color: rgb(17, 132, 11);
-    text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: normal;
-  }
   
   .table-container {
     overflow-x: auto;
@@ -119,17 +114,17 @@
   
   th {
     border: 2px solid black;
-    padding: 0.3rem;
+    padding: 0.8rem;
     font-size: 1.2rem;
     font-weight: normal;
-    background-color: rgb(17, 132, 11);
+    background-color: rgb(255, 189, 91);
     color: #fff;
   }
   
   td {
     border: 1px solid black;
     text-align: center;
-    padding: 0.1rem 0.5rem;
-    background-color: #f1f9f5;
+    padding: 0.8rem;
+    background-color: #f8f8ed;
   }
   </style>

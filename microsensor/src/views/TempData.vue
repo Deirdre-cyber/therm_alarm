@@ -12,22 +12,22 @@
   <div class="table-container">
     <table>
       <tr>
-        <th>Sensor ID</th>
+        <th>Sensor</th>
         <th>Time and Date</th>
         <th>Current Temperature</th>
-        <th>Is Temperature Exceeded?</th>
-        <th>Location</th>
+        <th>Threshold Exceeded?</th>
+        <th>Where?</th>
         <th>Max Threshold</th>
         <th>Min Threshold</th>
       </tr>
       <tr v-for="(item, index) in displayedTempData" :key="index">
-        <td>{{ item.SensorID }}</td>
+        <td id = "sense">{{ item.SensorID }}</td>
         <td>{{ item.TimeDate }}</td>
         <td>{{ item.CurrTemp }}</td>
         <td>{{ item.IsExceeded }}</td>
         <td>{{ item.LocationID }}</td>
-        <td>{{ item.MaxThreshold }}</td>
-        <td>{{ item.MinThreshold }}</td>
+        <td id = "hot">{{ item.MaxThreshold }}</td>
+        <td id = "cold">{{ item.MinThreshold }}</td>
       </tr>
     </table>
 
@@ -45,11 +45,11 @@ export default {
   props: {
     msg: {
       type: String,
-      default: "All data",
+      default: "Temperature Data History",
     },
     intro: {
       type: String,
-      default: "Here, you'll find all the data from the sensors.",
+      default: "Here, you'll find a history of the temperature readings from all connected sensors.",
     },
   },
   data() {
@@ -72,6 +72,14 @@ export default {
       const responsebody = await response.json();
       this.allTempData = JSON.parse(responsebody.body)
       
+      for (let item of this.allTempData) {
+        item.TimeDate = new Date(item.TimeDate).toUTCString();
+        item.CurrTemp = item.CurrTemp + '\xB0C';
+        item.IsExceeded = item.IsExceeded ? 'Yes' : 'No';
+        item.MaxThreshold = item.MaxThreshold + '\xB0C';
+        item.MinThreshold = item.MinThreshold + '\xB0C';
+      }
+      
     } catch (error) {
       console.error('Error fetching data from API Gateway:', error);
     }
@@ -80,6 +88,7 @@ export default {
     displayedTempData() {
       const startIndex = (this.currentPage - 1) * 10;
       const endIndex = startIndex + 10;
+
       return this.allTempData.slice(startIndex, endIndex);
     },
   },
@@ -110,13 +119,13 @@ table {
   margin: auto;
 }
 
-th {
+th, #sense {
   border: 2px solid black;
   padding: 0.8rem;
   font-size: 1.2rem;
   font-weight: normal;
-  background-color: rgb(255, 189, 91);
-  color: #fff;
+  background-color: rgb(244, 222, 188);
+  color: #000;
 }
 
 td {
@@ -125,4 +134,17 @@ td {
   padding: 0.8rem;
   background-color: #f8f8ed;
 }
+
+#hot {
+  background-color: rgb(237, 171, 166);
+  color: rgb(93, 22, 8);
+}
+
+#cold {
+  background-color: rgb(169, 241, 241);
+  color: rgb(8, 93, 93);
+}
+
+
+
 </style>

@@ -20,7 +20,7 @@
           <th>Duration</th>
           <th>Summary</th>
           <th>Image Included?</th>
-          <th>Image URL</th>
+          <th>Image </th>
           <th>Actions</th>
         </tr>
         <tr>

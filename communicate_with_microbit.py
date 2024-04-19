@@ -1,16 +1,27 @@
 import serial
 import sys
+import os
+
 from datetime import datetime
 import requests
 import json
-import os
-from dotenv import load_dotenv
+import boto3
+import time
+from decimal import Decimal
 
-load_dotenv()
+# https://stackoverflow.com/questions/1960516/python-json-serialize-a-decimal-object
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return str(o)
+        return super().default(o)
 
 COM_PORT = 'COM3'
 BAUD_RATE = 115200
-LAMBDA_ENDPOINT = os.getenv('LAMBDA_ENDPOINT')
+#API_ENDPOINT = 'https://woqi43dh1h.execute-api.eu-north-1.amazonaws.com/test'
+RUN_TIME = 20
+
+lambda_client = boto3.client('lambda', region_name='eu-north-1')
 
 try:
     ser = serial.Serial(COM_PORT, BAUD_RATE)
@@ -21,8 +32,14 @@ try:
         print("Could not open serial port.")
         sys.exit()
 
+    start_time = time.time()
+
     with open('temperature_data.txt', 'w', encoding='utf-8') as log_file:
         while True:
+            if time.time() - start_time >= RUN_TIME:
+                print("Program finished running for 20 seconds")
+                break
+            
             try:
                 temperature_data = ser.readline().decode('utf-8').rstrip()
             
@@ -30,33 +47,39 @@ try:
 
                 current_time = datetime.now().isoformat()
 
-                # dictionary for the date for ease in uploading to the database
-                # trhresholds will need to be set from app...
+                sensor_id = variables[0]
+                date_time = current_time
+                max_threshold = int(variables[1].strip())
+                min_threshold = int(variables[2].strip())
+                location_id = variables[3].strip()
+                curr_temp = float(variables[4].strip())
+                is_exceeded = variables[5].strip().lower() == "true"
+
                 data = {
-                    'sensor_id' : variables[0],
-                    'date_time' : current_time,
-                    'max_threshold' : variables[1],
-                    'min_threshold' : variables[2],
-                    'location_id' : variables[3],
-                    'curr_temp' : variables[4],
-                    'is_exceeded' : variables[5]
+                    'sensor_id': sensor_id,
+                    'date_time': date_time,
+                    'max_threshold': Decimal(max_threshold),
+                    'min_threshold': Decimal(min_threshold),
+                    'location_id': location_id,
+                    'curr_temp': Decimal(curr_temp),
+                    'is_exceeded': is_exceeded
                 }
 
-                json_data = json.dumps(data)
+                #print("JSON Object:", json.dumps(data))
 
+                json_data = json.dumps(data, cls=DecimalEncoder)
 
                 try:
-                    response = requests.post(LAMBDA_ENDPOINT, json=json_data, timeout=5)
+                    #response = requests.post(API_ENDPOINT, json=json_data, timeout=5)
+                    response = lambda_client.invoke(
+                    FunctionName='HttpRequestHandlerLambda',
+                    InvocationType='RequestResponse',
+                    Payload=json_data
+                    )
 
-                    if response.status_code == 200:
-                        print("Data sent to the database")
-                    else:
-                        print("Error sending data to the database")
+                    print("Data sent to the database")
                 except requests.exceptions.RequestException as e:
                     print("Error sending data to the database:", e)
-
-                # log file is for debugging
-                log_file.write(data['sensor_id'] + ',' + str(data['date_time']) + ',' + data['max_threshold'] + ',' + data['min_threshold'] + ',' + data['location_id'] + ',' + data['curr_temp'] + ',' + data['is_exceeded'] + '\n')
 
             except KeyboardInterrupt as e:
                 print("Keyboard interrupt. Exiting program")

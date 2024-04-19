@@ -71,6 +71,8 @@ export default {
 
       const responsebody = await response.json();
       this.allTempData = JSON.parse(responsebody.body)
+
+      this.allTempData.sort((a, b) => new Date(a.TimeDate) - new Date(b.TimeDate));
       
       for (let item of this.allTempData) {
         item.TimeDate = new Date(item.TimeDate).toUTCString();

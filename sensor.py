@@ -2,7 +2,7 @@ from microbit import *
 import utime
 
 SENSOR_ID = "SENSE001"
-LOCATION_ID = "BEDROOM_MAIN"
+LOCATION_ID = "S300"
 HIGH_THRESHOLD = 23
 LOW_THRESHOLD = 19
 

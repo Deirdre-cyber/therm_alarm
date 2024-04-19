@@ -9,7 +9,7 @@ import boto3
 import time
 from decimal import Decimal
 
-# https://stackoverflow.com/questions/1960516/python-json-serialize-a-decimal-object
+# https://www.geeksforgeeks.org/python-json-serialize-a-decimal-object/
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Decimal):
@@ -18,7 +18,6 @@ class DecimalEncoder(json.JSONEncoder):
 
 COM_PORT = 'COM3'
 BAUD_RATE = 115200
-#API_ENDPOINT = 'https://woqi43dh1h.execute-api.eu-north-1.amazonaws.com/test'
 RUN_TIME = 20
 
 lambda_client = boto3.client('lambda', region_name='eu-north-1')
@@ -65,12 +64,11 @@ try:
                     'is_exceeded': is_exceeded
                 }
 
-                #print("JSON Object:", json.dumps(data))
-
                 json_data = json.dumps(data, cls=DecimalEncoder)
 
+                log_file.write(json_data)
+
                 try:
-                    #response = requests.post(API_ENDPOINT, json=json_data, timeout=5)
                     response = lambda_client.invoke(
                     FunctionName='HttpRequestHandlerLambda',
                     InvocationType='RequestResponse',
